@@ -19,6 +19,11 @@ database.once('open', function callback () {
 app.use(bodyParser.json())
 
 // Import my test routes into the path '/test'
+app.get('/', (req, res) => {
+    res.send("WORK");
+});
+
+// Import my test routes into the path '/test'
 app.post('/api/user/', (req, res) => {
     var user = {
         "username": req.body.username,
