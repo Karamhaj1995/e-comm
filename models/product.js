@@ -1,9 +1,12 @@
 var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
+var category = require('./category');
 
 var product_schema = new mongoose.Schema({
-    name: { type: String, lowercase: true, required: [ true, "can't be blank" ] },
-    url: { type: String, lowercase: true, required: [ true, "can't be blank" ], index: true },
+    name: { type: String, required: [ true, "can't be blank" ] },
+    price: { type: Number },
+    url: { type: String, required: [ true, "can't be blank" ] },
+    category: { type:[category.Category] }
 }, { timestamps: true });
 
 product_schema.plugin(uniqueValidator, { message: 'is already taken.' });

@@ -1,11 +1,8 @@
 var config = require('../config/config');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
-require('../models/user');
 
-login_redirect = (response) => {
-    response.redirect('/login');
-}
+require('../models/user');
 
 module.exports.registerNewUser = async (req, res) => {
     req.body.password = bcrypt.hashSync(req.body.password, config.hashRounds);
@@ -14,42 +11,45 @@ module.exports.registerNewUser = async (req, res) => {
         email: req.body.email,
         hashed: req.body.password
     }
-    console.log(req.body)
-    console.log(user_data)
     var user = new User(user_data);
     var result = await user.save();
     res.send(result)
 };
 
-module.exports.login  = async (req, res, next) => {
+module.exports.login = async (req, res, next) => {
     try {
         if(!req.body) { return login_redirect(res); }
         var user = await User.findOne({ username: req.body.username }).exec();
         if(!user) {
-            return login_redirect(res);
+            res.render('templates/login', {'errors': ['User now found']});
         }
         if(!bcrypt.compareSync(req.body.password, user.hashed)) {
-            return login_redirect(res);
+            res.render('templates/login', {'errors': ['Bad password']});
         }
-        res.redirect('/dashboard');
+        let token = jwt.sign({ username: user.username }, config.secret, { expiresIn: '24h' });
+        return res.json({
+            success: true,
+            token: token
+        });
     } catch (error) {
-        return login_redirect(res);
+        res.render('templates/login', {'errors': [error]});
     }
 }
 
-module.exports.isAuthorized  = function(req, res, next) {
-
-    if(!req.session) { return login_redirect(res); }
-
-    User.findById(req.session.userId).exec(function (error, user) {
-        if (error) {
-            return login_redirect(res);
-        } else {      
-            if (user === null) { 
-                return login_redirect(res);
-            } else {
-                return next();
+module.exports.checkToken = (req, res, next) => {
+    let token = req.headers['cookie'];
+    if(token && token.startsWith('authorization=Bearer')) {
+        token = token.slice(21, token.length);
+    }
+    if(token) {
+        jwt.verify(token, config.secret, (err, decoded) => {
+            if(err) { 
+                res.render('templates/login', {'errors': ['Invalid Token']});
             }
-        }
-    });
-}
+            req.decoded = decoded;
+            next();
+        });
+    } else {
+        res.render('templates/login', {'errors': ['No Token Provided']});
+    }
+};

@@ -20,21 +20,19 @@ app.use(express.static('views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
-app.get('/', auth.isAuthorized, (req, res) => { res.render('templates/index', {'name':'karam'}) });
+app.get('/', auth.checkToken, (req, res) => { 
+    res.render('templates/index', {'name':'karam'}) 
+});
+
 app.get('/register', (req, res) => {
     res.render('templates/register');
 });
 
-app.get('/login', (req, res) => {     
-    if(req.session) {
-        delete req.session.user_id;
-    }
-    res.render('templates/login');
+app.get('/login', (req, res) => {
+    res.render('templates/login', {errors: []});
 });
 
-app.post('/login', (req, res, next) => { 
-    return auth.login(req, res, next);
-});
+app.post('/login', auth.login);
 
 // Logut Handler
 app.get('/logout', function (req, res) {
