@@ -7,8 +7,7 @@ var secret = require('../config/config').secret;
 var user_schema = new mongoose.Schema({
     username: { type: String, lowercase: true, required: [ true, "can't be blank" ] },
     email: { type: String, lowercase: true, required: [ true, "can't be blank" ], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true },
-    hash: String,
-    salt: String
+    hashed: String
 }, { timestamps: true });
 
 user_schema.plugin(uniqueValidator, { message: 'is already taken.' });
@@ -43,6 +42,6 @@ user_schema.methods.to_auth_json = () => {
         bio: this.bio,
         image: this.image
     };
-};    
+};
 
 module.exports = User = mongoose.model('users', user_schema);

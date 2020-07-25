@@ -1,56 +1,50 @@
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const app = express()
-const port = 3000
-const mongoose = require('mongoose')
-require('./models/user');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+const mongoose = require('mongoose');
+
+var auth = require('./logic/auth');
 
 mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true });
-
-const database = mongoose.connection;
-
-database.on('error', console.error.bind(console, 'connection error:'));
-database.once('open', function callback () {
-    console.log(`connected`);
+mongoose.connection.once('open', function callback () {
+    console.log(`Database connected`);
 });
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('views'));
 
-// Import my test routes into the path '/test'
-app.get('/', (req, res) => {
-    res.send("WORK");
+// use ejs engine
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
+
+app.get('/', auth.isAuthorized, (req, res) => { res.render('templates/index', {'name':'karam'}) });
+app.get('/register', (req, res) => {
+    res.render('templates/register');
 });
 
-// Import my test routes into the path '/test'
-app.post('/api/user/', (req, res) => {
-    var user = {
-        "username": req.body.username,
-        "email": req.body.email,
-    };
-    User.create(user, (err, doc) => {
-        if(err) res.send(err);
-        else { res.send(doc); }
-    }); 
+app.get('/login', (req, res) => {     
+    if(req.session) {
+        delete req.session.user_id;
+    }
+    res.render('templates/login');
 });
 
-// Import my test routes into the path '/test'
-app.get('/api/user/', (req, res) => {
-    var user = {};
-    User.find(user, (err, docs) => {
-        if(err) res.send(err);
-        else { res.send(docs); }
-    }); 
+app.post('/login', (req, res, next) => { 
+    return auth.login(req, res, next);
 });
 
-// Import my test routes into the path '/test'
-app.delete('/api/user/', (req, res) => {
-    var user = { email: req.body.email };
-    User.deleteOne(user, (err) => {
-        if(err) res.send(err);
-        else { res.send(true); }
-    }); 
+// Logut Handler
+app.get('/logout', function (req, res) {
+    if(req.session) {
+        delete req.session.user_id;
+    }
+    res.redirect('/login');    
 });
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+app.use('/api', require('./api/user'));
+app.use('/api', require('./api/product'));
+
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
