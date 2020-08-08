@@ -1,10 +1,9 @@
-
 var express = require('express');
 var router = express.Router();
 require('../models/product');
 
 // Import my test routes into the path '/test'
-router.post('/product/', (req, res) => {
+router.post('/products/', (req, res) => {
     var product = {
         "name": req.body.name,
         "url": req.body.url,
@@ -16,7 +15,7 @@ router.post('/product/', (req, res) => {
 });
 
 // Import my test routes into the path '/test'
-router.get('/product/', (req, res) => {
+router.get('/products/', (req, res) => {
     var product = {};
     Product.find(product, (err, docs) => {
         if(err) res.send(err);
@@ -25,7 +24,7 @@ router.get('/product/', (req, res) => {
 });
 
 // Import my test routes into the path '/test'
-router.delete('/product/', (req, res) => {
+router.delete('/products/', (req, res) => {
     var product = { name: req.body.name };
     Product.deleteOne(product, (err) => {
         if(err) res.send(err);

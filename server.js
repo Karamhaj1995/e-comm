@@ -21,7 +21,19 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
 app.get('/', auth.checkToken, (req, res) => { 
-    res.render('templates/index', {'name':'karam'}) 
+    res.render('templates/index', {
+        'app': {
+            'pages': [
+                {'name': 'products', 'icon': 'product-hunt'},
+                {'name': 'deals', 'icon': 'credit-card'},
+                // {'name': 'store', 'icon': 'check'},
+            ]
+        },
+        'user': { 
+            'name':'karam',
+            'language': 'en'
+        }
+    }); 
 });
 
 app.get('/register', (req, res) => {
@@ -43,6 +55,6 @@ app.get('/logout', function (req, res) {
 });
 
 app.use('/api', require('./api/user'));
-app.use('/api', require('./api/product'));
+app.use('/api', auth.checkToken, require('./api/product'));
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

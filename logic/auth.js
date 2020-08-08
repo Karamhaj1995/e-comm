@@ -16,7 +16,7 @@ module.exports.registerNewUser = async (req, res) => {
     res.send(result)
 };
 
-module.exports.login = async (req, res, next) => {
+module.exports.login = async(req, res, next) => {
     try {
         if(!req.body) { return login_redirect(res); }
         var user = await User.findOne({ username: req.body.username }).exec();
@@ -38,18 +38,20 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.checkToken = (req, res, next) => {
     let token = req.headers['cookie'];
-    if(token && token.startsWith('authorization=Bearer')) {
-        token = token.slice(21, token.length);
-    }
     if(token) {
+        token.split('; ').forEach(element => {
+            if(element.startsWith('authorization=Bearer')) {
+                token = element.slice(21, element.length);
+            }
+        });
         jwt.verify(token, config.secret, (err, decoded) => {
             if(err) { 
-                res.render('templates/login', {'errors': ['Invalid Token']});
+                return res.render('templates/login', {'errors': ['Invalid Token']});
             }
             req.decoded = decoded;
-            next();
+            return next();
         });
     } else {
-        res.render('templates/login', {'errors': ['No Token Provided']});
+        return res.render('templates/login', {'errors': ['No Token Provided']});
     }
 };
