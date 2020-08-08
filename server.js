@@ -1,11 +1,16 @@
-
+const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 var auth = require('./logic/auth');
+var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate};
 
 mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true });
 mongoose.connection.once('open', function callback () {
@@ -57,4 +62,5 @@ app.get('/logout', function (req, res) {
 app.use('/api', require('./api/user'));
 app.use('/api', auth.checkToken, require('./api/product'));
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+// app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+https.createServer(credentials, app).listen(8443);
