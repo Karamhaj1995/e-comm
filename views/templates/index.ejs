@@ -15,7 +15,7 @@
     <div class="app">
         <div class="navigation_bar">
             <div class="header">
-                <i class="fa fa-check"></i><span><%= user.name %></span>
+                <img src="<%= user.image_link %>" /><span><%= user.username %></span>
             </div>
             <% for(var page of app.pages) {  %>
                 <div class="page" name="<%= page.name %>">

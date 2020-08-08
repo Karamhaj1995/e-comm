@@ -5,9 +5,11 @@ var jwt = require('jsonwebtoken');
 var secret = require('../config/config').secret;
 
 var user_schema = new mongoose.Schema({
+    facebook_id: { type: String, required: false },
     username: { type: String, lowercase: true, required: [ true, "can't be blank" ] },
-    email: { type: String, lowercase: true, required: [ true, "can't be blank" ], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true },
-    hashed: String
+    email: { type: String, lowercase: true, required: false, match: [/\S+@\S+\.\S+/, 'is invalid'], index: true },
+    hashed: String,
+    image_link: { type: String, required: false },
 }, { timestamps: true });
 
 user_schema.plugin(uniqueValidator, { message: 'is already taken.' });

@@ -9,8 +9,11 @@ $(document).ready(() => {
         });
         FB.AppEvents.logPageView();
         FB.getLoginStatus(function(response) {
-            debugger
-            statusChangeCallback(response);
+            if(response.authResponse) {
+                console.log('here')
+            } else {
+                redirect_to_login();
+            }
         });
     };
     (function(d, s, id) {
@@ -20,8 +23,6 @@ $(document).ready(() => {
         js.src = "https://connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-
-
 
     var $navigation_bar = $('.navigation_bar');
     var $pages = $('.navigation_bar .page, .navigation_bar .header');
@@ -114,6 +115,25 @@ $(document).ready(() => {
             $icon.addClass($icon.attr('old-class'));
         });
         $pages.removeClass('loading')
+    }
+
+    function redirect_to_login() {
+        deleteAllCookies();
+        window.location = '/login'
+    }
+
+    function deleteAllCookies(){
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            set_cookie(cookies[i].split("=")[0], "", -1);
+        }
+    }
+
+    function set_cookie(name, value, expirydays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (expirydays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = name + "=" + value + "; " + expires;
     }
 
 });

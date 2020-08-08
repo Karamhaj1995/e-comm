@@ -5,12 +5,16 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 const fs = require('fs');
+const page_configuration = require('./config/page_config.js')
 
 var auth = require('./logic/auth');
-var privateKey  = fs.readFileSync('sslcert/server.key', 'utf8');
-var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+var privateKey  = fs.readFileSync('sslcert/cert.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/cert.pem', 'utf8');
 
-var credentials = {key: privateKey, cert: certificate};
+var credentials = {
+    key: privateKey, 
+    cert: certificate
+};
 
 mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true });
 mongoose.connection.once('open', function callback () {
@@ -25,19 +29,10 @@ app.use(express.static('views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
-app.get('/', auth.checkToken, (req, res) => { 
+app.get('/', auth.checkToken, (req, res) => {
     res.render('templates/index', {
-        'app': {
-            'pages': [
-                {'name': 'products', 'icon': 'product-hunt'},
-                {'name': 'deals', 'icon': 'credit-card'},
-                // {'name': 'store', 'icon': 'check'},
-            ]
-        },
-        'user': { 
-            'name':'karam',
-            'language': 'en'
-        }
+        'app': page_configuration,
+        'user': req.decoded.user
     }); 
 });
 
