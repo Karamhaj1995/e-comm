@@ -1,7 +1,6 @@
-module.exports = {
-    'pages': [
-        {'name': 'discover', 'icon': 'search'},
-        {'name': 'products', 'icon': 'product-hunt'},
-        {'name': 'deals', 'icon': 'credit-card'},
-    ]
-}
+module.exports.header = 'Public Marker'
+module.exports.pages = [
+    {'name': 'discover', 'icon': 'search'},
+    {'name': 'products', 'icon': 'product-hunt'},
+    {'name': 'deals', 'icon': 'credit-card'},
+]

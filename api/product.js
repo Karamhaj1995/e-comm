@@ -1,17 +1,37 @@
 var express = require('express');
 var router = express.Router();
 require('../models/product');
+require('../models/category');
 
 // Import my test routes into the path '/test'
 router.post('/products/', (req, res) => {
-    var product = {
-        "name": req.body.name,
-        "url": req.body.url,
-    };
-    Product.create(product, (err, doc) => {
+    Category.find({ name: req.body.category }, (err, category) => {
         if(err) res.send(err);
-        else { res.send(doc); }
-    }); 
+        var product = {
+            "name": req.body.name,
+            "url": req.body.url,
+            "image": req.body.image,
+            "price": req.body.price
+        };
+        if(!category.length) {
+            Category.create({ "name": req.body.category }, (err, created_category) => {
+                if(err) res.send(err);
+                else {
+                    product["category"] = created_category;
+                    Product.create(product, (err, doc) => {
+                        if(err) { res.send(err); }
+                        else { res.send(doc); }
+                    });
+                }
+            });
+        } else {
+            product["category"] = category[0];
+            Product.create(product, (err, doc) => {
+                if(err) { res.send(err); }
+                else { res.send(doc); }
+            });
+        }
+    });
 });
 
 // Import my test routes into the path '/test'

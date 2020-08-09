@@ -26,6 +26,7 @@ $(document).ready(() => {
 
     var $navigation_bar = $('.navigation_bar');
     var $pages = $('.navigation_bar .page, .navigation_bar .header');
+    
 
     $navigation_bar.on('click', e => {
         if($navigation_bar.hasClass('reset')) {
@@ -91,20 +92,6 @@ $(document).ready(() => {
                     build_deals_page(data);
                 }
             }
-        });
-    }
-
-    function build_products_page(products) {
-        $('.app .content .header').html('<p>Products Page</p><i class="fa fa-plus"></i>');
-        $('.products_list').remove();
-        $('.app .content').append('<div class="products_list"></div>');
-        products.forEach(product => {
-            $('.app .content .products_list').append(`
-                <div class="product_item">
-                    <img src="../images/test-item.jpg" />
-                    <p class="product_title">some title user</p>
-                </div>
-            `);
         });
     }
 

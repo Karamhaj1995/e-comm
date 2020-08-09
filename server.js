@@ -56,6 +56,7 @@ app.get('/logout', function (req, res) {
 
 app.use('/api', require('./api/user'));
 app.use('/api', auth.checkToken, require('./api/product'));
+app.use('/api', auth.checkToken, require('./api/category'));
 
 // app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 https.createServer(credentials, app).listen(8443);
