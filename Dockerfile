@@ -17,4 +17,4 @@ RUN npm install mongoose-unique-validator
 RUN npm install ejs
 
 RUN service mongodb restart
-RUN node server.js
+RUN node ./server.js
